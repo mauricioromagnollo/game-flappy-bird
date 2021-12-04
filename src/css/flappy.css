@@ -22,14 +22,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   min-height: 100%;
 }
 
 [game-flappy] {
   position: relative;
   border: 5px solid dodgerblue;
-  height: 700px;
-  width: 1200px;
+  height: 90vh;
+  width: 100vw;
   margin: 15px;
   background-color: deepskyblue;
   overflow: hidden;
@@ -62,6 +63,8 @@ body {
   width: 130px;
   background: linear-gradient(90deg, #639301, #A5E82E);
   border: 2px solid #000;
+  border-radius: 5px;
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.6);
 }
 
 .barrier .barrier-body {
@@ -70,6 +73,7 @@ body {
   background: linear-gradient(90deg, #639301, #A5E82E);
   border-left: 2px solid #000;
   border-right: 2px solid #000;
+  box-shadow: 2px 2px 2px 1px rgba(0, 0, 0, 0.6);
 }
 
 .progress {
