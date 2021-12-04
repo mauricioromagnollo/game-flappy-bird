@@ -1,14 +1,35 @@
-function newElement(tagName, className) {
-  const component = document.createElement(tagName)
-  component.className = className
-  return component
+/*
+ * Exceptions
+ */
+
+class InvalidParamTypeException extends Error {
+  constructor(message = '') {
+    super(message);
+    this.name = 'InvalidParamTypeException';
+  }
+}
+
+class DOM {
+  static createNewHtmlElement({ tagName = 'div', cssClassName = '' }) {
+    if (typeof tagName !== 'string') {
+      throw new InvalidParamTypeException(`DOM.createNewHtmlElement: The param tagName must be of type 'string', but received the type '${typeof tagName}'.`);
+    }
+
+    if (typeof cssClassName !== 'string') {
+      throw new InvalidParamTypeException(`DOM.createNewHtmlElement: The param cssClassName must be of type 'string', but received the type '${typeof cssClassName}'.`);
+    }
+
+    const $newHtmlElement = document.createElement(tagName);
+    $newHtmlElement.className = cssClassName ? cssClassName : '';
+    return $newHtmlElement;
+  }
 }
 
 function Barrier(reverse = false) {
-  this.component = newElement('div', 'barrier')
+  this.component = DOM.createNewHtmlElement({ cssClassName: 'barrier' });
   
-  const barrierBorder = newElement('div', 'barrier-border')
-  const barrierBody = newElement('div', 'barrier-body')
+  const barrierBorder =  DOM.createNewHtmlElement({ cssClassName: 'barrier-border' });
+  const barrierBody =  DOM.createNewHtmlElement({ cssClassName: 'barrier-body' });
 
   this.component.appendChild(reverse ? barrierBody : barrierBorder)
   this.component.appendChild(reverse ? barrierBorder : barrierBody)
@@ -17,7 +38,7 @@ function Barrier(reverse = false) {
 }
 
 function PairOfBarries( height, aperture, x) {
-  this.component = newElement('div', 'pair-of-barriers')
+  this.component =  DOM.createNewHtmlElement({ cssClassName: 'pair-of-barriers' });
 
   this.upper = new Barrier(true)
   this.bottom = new Barrier(false)
@@ -76,7 +97,7 @@ function Barriers(height, width, aperture, space, notifyPoint) {
 function Bird(gameHeight) {
   let flying = false 
 
-  this.component = newElement('img', 'bird')
+  this.component = DOM.createNewHtmlElement({ tagName: 'img', cssClassName: 'bird' });
   this.component.src = 'imgs/bird.png'
 
   this.getY = () => parseInt(this.component.style.bottom.split('px')[0])
@@ -103,7 +124,7 @@ function Bird(gameHeight) {
 }
 
 function Progress() {
-  this.component = newElement('span', 'progress')
+  this.component = DOM.createNewHtmlElement({ tagName: 'span', cssClassName: 'progress' });
   
   this.updateScores = scores => {
     this.component.innerHTML = scores
@@ -126,21 +147,23 @@ function isOverlapping(elementA, elementB) {
 }
 
 function isCollided(bird, barriers) {
-  let collision = false
+  let hasCollision = false
+  const { pairs: pairsOfBarriers  } = barriers
   
-  barriers.pairs.forEach(PairOfBarries => {
-    if(!collision) {
+  pairsOfBarriers.forEach(PairOfBarries => {
+    if(!hasCollision) {
       const upper = PairOfBarries.upper.component
       const bottom = PairOfBarries.bottom.component 
-      collision = isOverlapping(bird.component, upper) || isOverlapping(bird.component, bottom)
+      hasCollision = isOverlapping(bird.component, upper) || isOverlapping(bird.component, bottom)
     }
   })
   
-  return collision
+  return hasCollision
 }
 
 function FlappyBird() {
   let scores = 0
+  const GAME_SPEED = 20
 
   const gameArea = document.querySelector('[game-flappy]')
   const height = gameArea.clientHeight
@@ -156,15 +179,15 @@ function FlappyBird() {
 
   this.start = () => {
     const timer = setInterval(() => {
-      barriers.animate()
-      bird.animate()
-
-      if(isCollided(bird, barriers)) {
-        clearInterval(timer)
-        alert('Collided')
-        // Reestart Game / Save Scores       
-      }
-    }, 20)
+        barriers.animate()
+        bird.animate()
+  
+        if(isCollided(bird, barriers)) {
+          clearInterval(timer)
+          alert('Collided')
+          // Reestart Game / Save Scores       
+        }
+    }, GAME_SPEED)
   }
 }
 
